@@ -185,8 +185,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             //Read temperatures from cursor
             boolean isMetric = Utility.isMetric(getActivity());
-            String high = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
-            String low = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
+            String high = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP));
+            String low = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP));
             //set the temperature views
             dHighTempView.setText(high);
             dLowTempView.setText(low);
