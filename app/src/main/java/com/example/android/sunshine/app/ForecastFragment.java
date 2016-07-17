@@ -1,7 +1,10 @@
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
@@ -61,6 +65,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
      * Instantiates a new Forecast fragment.
      */
     public ForecastFragment() {
+    }
+
+    private static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connection = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connection.getActiveNetworkInfo();
+        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
     }
 
     @Override
@@ -136,7 +146,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void updateWeather() {
-        SunshineSyncAdapter.syncImmediately(getActivity());
+
+        if (isNetworkAvailable(getActivity())) {
+            SunshineSyncAdapter.syncImmediately(getActivity());
+        } else {
+            Toast.makeText(getActivity(), "No Internet Connection Available\nTry Again Later", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

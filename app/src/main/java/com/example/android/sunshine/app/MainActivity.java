@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 
 public class MainActivity extends AppCompatActivity implements ForecastFragment.Callback {
+
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
     public static boolean mTwoPane;
     private final String LOG_TAG = MainActivity.class.getSimpleName();
