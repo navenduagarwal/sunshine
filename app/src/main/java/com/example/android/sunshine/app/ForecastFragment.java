@@ -136,13 +136,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     // since we read the location when we create the loader, all we need to do is restart things
     void onLocationChanged() {
-        updateWeather();
         getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
-    }
-
-    private void updateWeather() {
-
-        SunshineSyncAdapter.syncImmediately(getActivity());
     }
 
     @Override
@@ -210,6 +204,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 int message = R.string.empty_forecast_list;
                 @SunshineSyncAdapter.LocationStatus int error = Utility.getLocationStatus(getActivity());
                 switch (error) {
+                    case SunshineSyncAdapter.LOCATION_STATUS_INVALID:
+                        message = R.string.empty_forecast_location_invalid;
+                        break;
                     case SunshineSyncAdapter.LOCATION_STATUS_SERVER_DOWN:
                         message = R.string.empty_forecast_list_server_down;
                         break;

@@ -50,6 +50,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final int LOCATION_STATUS_SERVER_DOWN = 1;
     public static final int LOCATION_STATUS_SERVER_INVALID = 2;
     public static final int LOCATION_STATUS_UNKNOWN = 3;
+    public static final int LOCATION_STATUS_INVALID = 4;
     // Interval at which to sync with the weather, in milliseconds.
     // 60 seconds (1 minute)  180 = 3 hours
     private static final int SYNC_INTERVAL = 60 * 180; //sync interval for old devices
@@ -170,7 +171,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
      * @param c              context to get shared preferences manager
      * @param locationStatus The IntDef value to set
      */
-    private static void setLocationStatus(Context c, @LocationStatus int locationStatus) {
+    public static void setLocationStatus(Context c, @LocationStatus int locationStatus) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(c);
         SharedPreferences.Editor spe = preferences.edit();
         spe.putInt(c.getString(R.string.pref_location_status_key), locationStatus);
@@ -312,9 +313,25 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         final String OWM_WEATHER = "weather";
         final String OWM_DESCRIPTION = "main";
         final String OWM_WEATHER_ID = "id";
+        final String OWM_MESSAGE_CODE = "cod";
 
         try {
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
+
+            // doe we have errors
+            if (forecastJson.has(OWM_MESSAGE_CODE)) {
+                int code = forecastJson.getInt(OWM_MESSAGE_CODE);
+                switch (code) {
+                    case HttpURLConnection.HTTP_OK:
+                        break;
+                    case HttpURLConnection.HTTP_NOT_FOUND:
+                        setLocationStatus(getContext(), LOCATION_STATUS_INVALID);
+                        return;
+                    default:
+                        setLocationStatus(getContext(), LOCATION_STATUS_SERVER_DOWN);
+                        return;
+                }
+            }
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
             JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
@@ -399,13 +416,12 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 cVVector.add(weatherValues);
             }
-            int inserted = 0;
             // add to database
             if (cVVector.size() > 0) {
                 // Student: call bulkInsert to add the weatherEntries to the database here
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
-                inserted = getContext().getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI,
+                getContext().getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI,
                         cvArray);
                 //delete old data
                 getContext().getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
@@ -414,8 +430,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 notifyWeather();
             }
 
-            Log.d(LOG_TAG, "Sunshine service complete. " + inserted + " Inserted");
-            setLocationStatus(getContext(),LOCATION_STATUS_OK);
+            Log.d(LOG_TAG, "Sunshine service complete. " + cVVector.size() + " Inserted");
+            setLocationStatus(getContext(), LOCATION_STATUS_OK);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -558,6 +574,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     //annotation variables
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID, LOCATION_STATUS_SERVER_DOWN})
+    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID,
+            LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_INVALID, LOCATION_STATUS_UNKNOWN})
     public @interface LocationStatus{}
 }
