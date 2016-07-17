@@ -1,12 +1,11 @@
 package com.example.android.sunshine.app;
 
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -21,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
@@ -28,7 +28,7 @@ import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
  */
-public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
     // These indices are tied to Forecast Columns. If FORECAST_COLUMNS changes these must change
     static final int COL_WEATHER_ID = 0;
     static final int COL_WEATHER_DATE = 1;
@@ -64,12 +64,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
      * Instantiates a new Forecast fragment.
      */
     public ForecastFragment() {
-    }
-
-    private static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connection = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connection.getActiveNetworkInfo();
-        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
     }
 
     @Override
@@ -148,11 +142,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void updateWeather() {
 
-        if (isNetworkAvailable(getActivity())) {
-            SunshineSyncAdapter.syncImmediately(getActivity());
-        } else {
-
-        }
+        SunshineSyncAdapter.syncImmediately(getActivity());
     }
 
     @Override
@@ -193,6 +183,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 }
             });
         }
+        updateEmptyView();
     }
 
     @Override
@@ -205,6 +196,33 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mUseTodayLayout = useTodayLayout;
         if (mForecastAdapter != null) {
             mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
+        }
+    }
+
+    /**
+     * Updates the empty view with contextually relevant information about network connectivity issue
+     */
+    private void updateEmptyView() {
+        if (mForecastAdapter.getCount() == 0) {
+            TextView emptyUpdateView = (TextView) getView().findViewById(R.id.empty_listview);
+            if (null != emptyUpdateView) {
+                //if cursor is empty, why? do we have an invalid location
+                int message = R.string.empty_forecast_list;
+                @SunshineSyncAdapter.LocationStatus int error = Utility.getLocationStatus(getActivity());
+                switch (error) {
+                    case SunshineSyncAdapter.LOCATION_STATUS_SERVER_DOWN:
+                        message = R.string.empty_forecast_list_server_down;
+                        break;
+                    case SunshineSyncAdapter.LOCATION_STATUS_SERVER_INVALID:
+                        message = R.string.empty_forecast_list_server_error;
+                        break;
+                    default:
+                        if (!Utility.isNetworkAvailable(getActivity())) {
+                            message = R.string.empty_forecast_list_network_down;
+                        }
+                }
+                emptyUpdateView.setText(message);
+            }
         }
     }
 
@@ -226,6 +244,27 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                     Log.d(LOG_TAG, "Couldn't call" + geoLocation.toString() + "no receiving apps installed!");
                 }
             }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        preferences.registerOnSharedPreferenceChangeListener(this);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if (s.equals(getString(R.string.pref_location_status_key))) {
+            updateEmptyView();
         }
     }
 
