@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
@@ -110,6 +109,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
         // Get a reference to the ListView, and attach this adapter to it.
         mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        View emptyView = rootView.findViewById(R.id.empty_listview);
+        mListView.setEmptyView(emptyView);
         mListView.setAdapter(mForecastAdapter);
         //Adding click listener and calling Main Activity
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -150,7 +151,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         if (isNetworkAvailable(getActivity())) {
             SunshineSyncAdapter.syncImmediately(getActivity());
         } else {
-            Toast.makeText(getActivity(), "No Internet Connection Available\nTry Again Later", Toast.LENGTH_SHORT).show();
+
         }
     }
 
