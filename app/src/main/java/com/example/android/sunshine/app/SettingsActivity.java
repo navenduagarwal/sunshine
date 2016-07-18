@@ -43,6 +43,7 @@ public class SettingsActivity extends PreferenceActivity
         // updated when the preference changes.
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_art_pack_key)));
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -137,6 +138,9 @@ public class SettingsActivity extends PreferenceActivity
             // Our location status has changed. Update the summary accordingly
             Preference preference = findPreference(getString(R.string.pref_location_key));
             bindPreferenceSummaryToValue(preference);
+        } else if (key.equals(getString(R.string.pref_art_pack_key))) {
+            //art pack have changed. update lists of weather entries accordingly
+            getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
         }
     }
 }
