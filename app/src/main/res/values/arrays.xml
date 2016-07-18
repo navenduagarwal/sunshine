@@ -11,12 +11,12 @@
     </string-array>
 
     <string-array name="pref_art_pack_option">
-        <item>@string/pref_art_pack_label_cute_dogs</item>
+        <item>@string/pref_art_pack_label_mono</item>
         <item>@string/pref_art_pack_label_sunshine</item>
     </string-array>
 
     <string-array name="pref_art_pack_values">
-        <item>@string/pref_art_pack_cute_dogs</item>
+        <item>@string/pref_art_pack_mono</item>
         <item>@string/pref_art_pack_sunshine</item>
     </string-array>
 </resources>
