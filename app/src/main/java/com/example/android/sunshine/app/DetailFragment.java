@@ -160,11 +160,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Log.v(LOG_TAG, "In onLoadFinished");
         if (data != null && data.moveToFirst()) {
 
-            //Read weather condition id from Cursor
-            int weatherConditionId = data.getInt(COL_WEATHER_CONDITION_ID);
-            //use placeholder image
-            dIconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherConditionId));
-
             //read date from Cursor and update view for day of the week and date
             long date = data.getLong(COL_WEATHER_DATE);
             //Day for the date
@@ -175,13 +170,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             dFriendlyDayView.setText(day);
             dDateView.setText(dateString);
 
+            //Read weather condition id from Cursor
+            int weatherConditionId = data.getInt(COL_WEATHER_CONDITION_ID);
+
             // Read weather desc from cursor
-            String weatherDescription = data.getString(COL_WEATHER_DESC);
+            String weatherDescription = Utility.getStringForWeatherCondition(getActivity(), weatherConditionId);
             //set desc to view
             dDescView.setText(weatherDescription);
+            dDescView.setContentDescription(getString(R.string.a11y_forecast, weatherDescription));
 
+            //use placeholder image
+            dIconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherConditionId));
             //for accessibility add a content description to the icon field
-            dIconView.setContentDescription(weatherDescription);
+            dIconView.setContentDescription(getString(R.string.a11y_forecast_icon, weatherDescription));
 
             //Read temperatures from cursor
             boolean isMetric = Utility.isMetric(getActivity());
@@ -189,12 +190,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             String low = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP));
             //set the temperature views
             dHighTempView.setText(high);
+            dHighTempView.setContentDescription(getString(R.string.a11y_high_temp, high));
             dLowTempView.setText(low);
+            dLowTempView.setContentDescription(getString(R.string.a11y_low_temp, low));
 
             //Read humidity from cursor
             String humidity = String.format(getString(R.string.format_humidity), data.getFloat(COL_WEATHER_HUMIDITY));
             //set the view
             dHumidityView.setText(humidity);
+            dHumidityView.setContentDescription(dHumidityView.getText());
 
             //Read Wind values from cursor
             float windSpeed = data.getFloat(COL_WEATHER_WIND_SPEED);
@@ -202,7 +206,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             String formattedWindSpeed = Utility.getFormattedWind(getContext(), windSpeed, windDirection);
             //Set the wind view
             dWindView.setText(formattedWindSpeed);
-            //windSpeedView.setDegrees(windDirection);
+            dWindView.setContentDescription(formattedWindSpeed);
+
             windSpeedView.setSpeed(windSpeed);
             windSpeedView.setContentDescription(getResources().getString(R.string.anim_wind_speed) + windSpeed);
             windDirectionView.setWindDirection(windDirection);
@@ -212,6 +217,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             String pressure = String.format(getString(R.string.format_pressure), data.getFloat(COL_WEATHER_PRESSURE));
             //set view for pressure
             dPressureView.setText(pressure);
+            dPressureView.setContentDescription(dPressureView.getText());
 
 
             //If onCreateOptionsMenu has already happened, we need to update the share intent now

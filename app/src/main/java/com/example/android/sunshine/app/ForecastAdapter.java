@@ -77,24 +77,26 @@ public class ForecastAdapter extends CursorAdapter {
         viewHolder.dateView.setText(Utility.friendlyDateFormat(context, dateInMillis));
 
         //Read the Desc from Cursor
-        String desc = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
+        String desc = Utility.getStringForWeatherCondition(context, cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID));
         //Find the text view and set the desc
         viewHolder.descriptionView.setText(desc);
+        viewHolder.descriptionView.setContentDescription(context.getString(R.string.a11y_forecast, desc));
 
         //for accessibility, add content description to the icon field
-        viewHolder.iconView.setContentDescription(desc);
+        viewHolder.iconView.setContentDescription(context.getString(R.string.a11y_forecast_icon, desc));
 
         boolean isMetric = Utility.isMetric(context);
         //Read the Max Temp from Cursor
         double maxTemp = cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
         //Find the text view and set the temp
         viewHolder.highTempView.setText(Utility.formatTemperature(context, maxTemp));
+        viewHolder.highTempView.setContentDescription(context.getString(R.string.a11y_high_temp, maxTemp));
 
         //Read the Min Temp from Cursor
         double minTemp = cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP);
         //Find the text view and set the temp
         viewHolder.lowTempView.setText(Utility.formatTemperature(context, minTemp));
-
+        viewHolder.lowTempView.setContentDescription(context.getString(R.string.a11y_low_temp, minTemp));
     }
 
     public void setUseTodayLayout(boolean useTodayLayout) {
