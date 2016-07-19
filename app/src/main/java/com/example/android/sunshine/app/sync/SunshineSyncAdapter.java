@@ -524,6 +524,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     // based on sample simple notification in developer notes
                     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getContext())
+                            .setColor(resources.getColor(R.color.primary_light))
                             .setSmallIcon(iconId)
                             .setContentTitle(title)
                             .setContentText(contentText);
