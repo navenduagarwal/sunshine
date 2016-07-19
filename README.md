@@ -5,12 +5,12 @@ Synchronizes weather information from OpenWeatherMap on Android Phones and Table
 
 Pre-requisites
 --------------
-Android SDK 21 or Higher
-Build Tools version 21.1.2
-Android Support AppCompat 22.2.0
-Android Support Annotations 22.2.0
-Google Play Services GCM 7.0.0
-BumpTech Glide 3.5.2
+Android SDK 24 or Higher
+Build Tools version 24.0.0
+Android Support AppCompat 24.0.0
+Android Support Annotations 24.0.0
+Google Play Services GCM 9.2.1
+BumpTech Glide 3.7.0
 
 Getting Started
 ---------------
