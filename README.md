@@ -1,4 +1,4 @@
-Advanced Android Sample App
+Advanced Android Sample App - Sunshine
 ===================================
 
 Synchronizes weather information from OpenWeatherMap on Android Phones and Tablets. Used in the Udacity Advanced Android course.
