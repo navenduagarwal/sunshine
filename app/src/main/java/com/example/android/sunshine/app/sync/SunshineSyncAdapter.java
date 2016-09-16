@@ -494,12 +494,12 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                     @SuppressLint("InlinedApi")
                     int largeIconWidth = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
                             ? resources.getDimensionPixelSize(android.R.dimen.notification_large_icon_width)
-                            : resources.getDimensionPixelSize(R.dimen.notifications_large_icon_default);
+                            : resources.getDimensionPixelSize(R.dimen.notification_large_icon_default);
 
                     @SuppressLint("InlinedApi")
                     int largeIconHeight = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
                             ? resources.getDimensionPixelSize(android.R.dimen.notification_large_icon_height)
-                            : resources.getDimensionPixelSize(R.dimen.notifications_large_icon_default);
+                            : resources.getDimensionPixelSize(R.dimen.notification_large_icon_default);
                     //Retrieve the large icon
                     Bitmap largeIcon;
                     try {

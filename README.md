@@ -9,6 +9,7 @@ Android SDK 24 or Higher
 Build Tools version 24.0.0
 Android Support AppCompat 24.0.0
 Android Support Annotations 24.0.0
+Android Support GridLayout 24.0.0
 Google Play Services GCM 9.2.1
 BumpTech Glide 3.7.0
 
